@@ -1,0 +1,27 @@
+#!/bin/bash
+
+################################################
+## Default PXE for inventory and registration ##
+## ver .10                                    ##
+################################################
+
+/sbin/dhcpcd eth0
+
+## Get serial number for system
+
+FILE=/tmp/$mac.inventory
+COOKIE="mac=$mac"
+URL="http://$baracus/ba/inventory"
+
+echo -ne "collecting inventory information\n"
+
+## Create xml inventory file - eis static works ver 0.2.10
+/usr/bin/lshw-static.linux.ix86 -xml > $FILE
+#/usr/bin/lshw-static -xml > $FILE
+#hwinfo > $FILE
+
+echo -ne "uploading inventory file to $baracus ...\n"
+
+/usr/bin/curl -b $COOKIE -T $FILE $URL
+
+/sbin/reboot -f

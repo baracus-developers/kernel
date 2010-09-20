@@ -1,0 +1,33 @@
+#!/bin/bash
+
+################################################
+## Default PXE for inventory and registration ##
+## ver .20                                    ##
+## date: 9/13/2010                            ##
+################################################
+
+/sbin/dhcpcd eth0
+
+## Get serial number for system
+
+FILE=/tmp/$mac.image_complete
+COOKIE="mac=$mac;status=pass"
+URL="http://$baracus/ba/image"
+
+## Create FILE
+echo "Starting..." > $FILE
+date >> $FILE
+echo "image: $baimagesrc" >> $FILE
+echo "disk:  $baimagedst" >> $FILE
+
+echo -ne "Deploying image\n"
+/usr/bin/curl http://$baracus/var/spool/baracus/images/$baimagesrc | dd of=$baimagedst
+
+echo "Finished image" >> $FILE
+date >> $FILE
+
+echo -ne "uploading image complete file to $baracus ...\n"
+
+/usr/bin/curl -b $COOKIE -T $FILE $URL
+
+/sbin/reboot -f
