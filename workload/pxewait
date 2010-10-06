@@ -1,0 +1,59 @@
+#!/bin/bash
+
+trap 'keeper' 2
+trap 'keeper' 20
+
+keeper()
+{
+return
+}
+
+menu()
+{
+echo "#########################################"
+echo "## Baracus pxewait shell               ##"
+echo "##                                     ##"
+echo "## 1 - reboot                          ##"
+echo "## 2 - disconnect                      ##"
+echo "#########################################"
+}
+
+if [ ! -f /tmp/flag ]
+then
+  /sbin/dhcpcd eth0
+  mount -t devpts devpts /dev/pts
+  sleep 5
+  /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+fi
+
+echo "" > /tmp/flag
+clear
+menu
+while :
+do
+  echo -ne "> "
+  read selection
+  case $selection in
+  1)
+    echo "rebooting..."
+    /sbin/reboot -f
+  ;;
+  2)
+    if [[ x"$TERM" != x"linux" ]]
+    then
+      echo "disconnecting..."
+      exit
+    else
+      clear
+      menu
+    fi
+  ;;
+  8675309)
+    /bin/bash
+  ;;
+  *)
+    echo "invalid selection"
+  ;;
+  esac
+done
+

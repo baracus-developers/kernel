@@ -1,0 +1,125 @@
+#!/bin/bash
+
+################################################
+## Default PXE for Baracus dban               ##
+## ver .10                                    ##
+################################################
+
+/sbin/dhcpcd eth0
+
+URL="http://$baracus/ba/wipe"
+DBAN_LOG_TMP="/log/dban"
+FILE="$DBAN_LOG_TMP/wipelog"
+
+# Strip the heading and tailing quotes from the syslinux.cfg variable.
+DBAN_NUKE=`echo $nuke | sed -e 's/^"//' | sed -e 's/"$//'`
+
+# Include version information.
+export DBAN_NAME="Darik's Boot and Nuke (for Baracus)"
+export DBAN_VERSION="1.0.7"
+export DBAN_ARCH="i386"
+
+# Export the name and version variables so that dwipe can create a banner.
+export DBAN_NAME
+export DBAN_VERSION
+
+dbanLog ()
+{
+        echo "[`date +%Y/%m/%d %H:%M:%S`] dban: $1" >> $FILE 2> /dev/null
+}
+
+dbanFail ()
+{
+
+        # Reset the console, which is usually required when an ncurses program exits unexpectedly.
+        echo -e "\033[?25h\033c\033[J"
+
+        # Blink the error notification.
+        echo -e "\033[5;37;40mError:\033[0;37;40m $1"
+
+        # Log the failure.
+        dbanLog "Error: $1"
+        dbanLog "DBAN failed... disks have not been wiped"
+
+        # Print the failure notification with emphasis. 
+        echo -e "\033[1;31;40mDBAN failed."
+        echo -e "\033[1;37;40mThe disks have not been wiped."
+        echo -e "\033[0;37;40m"
+
+}
+
+# Clear any stray boot messages.
+clear
+
+# Blue background
+echo -e -n "\033[44m"
+
+# Grey foreground. 
+echo -e -n "\033[37m"
+
+# Disable screen blanking.
+echo -e -n "\033[9;0]" 
+
+# Clear the screen.
+echo -e -n "\033[2J"
+
+# Print the product banner.
+echo "$DBAN_NAME $DBAN_VERSION is loaded."
+
+echo -n "Programming the console..."
+echo -e "\\033[30;47]\033[9;0]screen blanking disabled."
+
+if ! mount -t tmpfs none /log/dban ; then
+        dbanFail "Unable to mount the scratch filesystem."
+else
+        echo "mounted the scratch filesystem"
+        dbanLog "mounted the scratch filesystem."
+fi
+
+dbanLog "$DBAN_NAME $DBAN_VERSION started."
+
+# Sanity check.  This proc file should never contain the '@' character.
+if grep '@' < /proc/scsi/scsi ; then
+        dbanFail "Sanity check failed. The /proc/scsi/scsi file contains the '@' character."
+fi
+
+# Record the start time.
+DBAN_START=`date '+%a %b %d %T %Y'`
+
+echo -e "\rStarting dwipe....                                                 " 
+sleep 5s
+dbanLog "dwipe called as $DBAN_NUKE"
+dbanLog "Wipe started at $DBAN_START"
+$DBAN_NUKE
+DBAN_RESULT=$?
+
+DBAN_FINISH=`date '+%a %b %d %T %Y'`
+dbanLog "Wipe completed at $DBAN_FINISH"
+
+if [ $DBAN_RESULT -lt 0 ]
+then
+        dbanFail "Dwipe failed with result $DBAN_RESULT."
+        COOKIE="mac=$mac;status=fail"
+elif [ $DBAN_RESULT -eq 0 ]
+then
+        # Print the success notification with emphasis.
+        echo -e "\033[1;32;40mDBAN succeeded."
+        echo -e "\033[1;37;40mAll selected disks have been wiped."
+        echo -e "\033[0;37;40m"
+        dbanLog "DBAN succeeded. All selected disks have been wiped."
+        COOKIE="mac=$mac;status=pass"
+else
+        # Print the warning notification with emphasis.
+        echo -e "\033[1;33;40mDBAN finished with non-fatal errors."
+        echo -e "\033[1;37;40mThis is usually caused by disks with bad sectors."
+        echo -e "\033[0;37;40m"
+        dbanLog "DBAN finished with non-fatal errors. The disks were either properly wiped, or there were verification errors."
+        COOKIE="mac=$mac;status=fail"
+fi
+
+echo "Hardware clock operation start date:  $DBAN_START"
+echo "Hardware clock operation finish date: $DBAN_FINISH"
+
+/usr/bin/curl -b $COOKIE -T $FILE $URL
+ 
+/sbin/halt -p -n -f
