@@ -1,3 +1,5 @@
+#!/bin/bash
+
 ## Create a new initrd.baracus
 ##
 ##
@@ -5,6 +7,7 @@
 DATADIR=workload
 DSTDIR=$DATADIR/initrd.dir
 
+[[ -d $DSTDIR ]] && rm -rf $DSTDIR
 mkdir $DSTDIR
 cp $DATADIR/initrd.opensuse-11.1 $DSTDIR
 
