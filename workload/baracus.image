@@ -6,7 +6,8 @@
 ## date: 9/13/2010                            ##
 ################################################
 
-/sbin/dhcpcd eth0
+echo -ne "Getting network settings via dhcp\n"
+/sbin/dhcpcd -t60 eth0
 
 ## Get serial number for system
 
