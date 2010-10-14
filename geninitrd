@@ -1,5 +1,14 @@
 #!/bin/bash
 
+pushd()
+{
+    builtin pushd "$@" > /dev/null
+}
+popd()
+{
+    builtin popd "$@" > /dev/null
+}
+
 ## Create a new initrd.baracus
 ##
 ##
@@ -8,75 +17,83 @@ DATADIR=workload
 DSTDIR=$DATADIR/initrd.dir
 
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
-mkdir $DSTDIR
+mkdir -p $DSTDIR
 cp $DATADIR/initrd.opensuse-11.1 $DSTDIR
 
 ## Extract the image
 ##
-cd $DSTDIR
-mv initrd.opensuse-11.1 initrd.gz
-gzip -d initrd.gz
-cpio --quiet -id < initrd 
-rm initrd
 
-## copy over the baracus data
-##
-cp ../pxewait usr/bin/pxewait
-cp ../busybox.dban usr/bin/busybox.dban
-cp ../baracus.dban usr/bin/baracus.dban
-cp ../baracus.image usr/bin/baracus.image
-cp ../baracus.register usr/bin/baracus.register
-cp ../lshw-static.linux.ix86 usr/bin/lshw-static.linux.ix86
-cp ../halt sbin/halt
-cp ../dropbear sbin/dropbear
-mkdir -p etc/dropbear
-cp ../dropbear_rsa_host_key etc/dropbear
-chown root:root etc/dropbear/dropbear_rsa_host_key
-cp ../shells etc/shells
+pushd $DSTDIR
+  mv initrd.opensuse-11.1 initrd.gz
+  gzip -d initrd.gz
+  cpio --quiet -id < initrd 
+  rm initrd
+  
+  ## copy over the baracus data
+  ##
+  cp ../pxewait usr/bin/pxewait
+  cp ../busybox.dban usr/bin/busybox.dban
+  cp ../baracus.dban usr/bin/baracus.dban
+  cp ../baracus.image usr/bin/baracus.image
+  cp ../baracus.register usr/bin/baracus.register
+  cp ../lshw-static.linux.ix86 usr/bin/lshw-static.linux.ix86
+  cp ../halt sbin/halt
+  cp ../dropbear sbin/dropbear
+  mkdir -p log/dban
+  cp -r ../terminfo usr/share/.
+  mkdir -p etc/dropbear
+  cp ../dropbear_rsa_host_key etc/dropbear
+  chown root:root etc/dropbear/dropbear_rsa_host_key
+  cp ../shells etc/shells
+  
+  pushd usr
+    ln -s . i386-linux-uclibc
+  popd
+  
+  pushd sbin
+    ln -s halt reboot
+  popd
+  
+  pushd bin
+    ln -s ../usr/bin/busybox.dban ash
+    ln -s ../usr/bin/busybox.dban cp
+    ln -s ../usr/bin/busybox.dban date
+    ln -s ../usr/bin/busybox.dban dd
+    ln -s ../usr/bin/busybox.dban dmesg
+    ln -s ../usr/bin/busybox.dban echo
+    ln -s ../usr/bin/busybox.dban grep
+    ln -s ../usr/bin/busybox.dban ls
+    ln -s ../usr/bin/busybox.dban mv
+    ln -s ../usr/bin/busybox.dban tar
+  popd
+  
+  pushd usr/bin
+    ln -s ../../usr/bin/busybox.dban clear
+    ln -s ../../usr/bin/busybox.dban dwipe
+    ln -s ../../usr/bin/busybox.dban sort
+    ln -s ../../usr/bin/busybox.dban tr
+    ln -s ../../usr/bin/busybox.dban wc
+  popd
+  
+  pushd etc
+    echo "root:Wvg7eFFQQVjbo:14869:0:99999:7:::" > shadow
+    echo "root:x:0:0:root:/root:/usr/bin/pxewait" > tmppasswd
+    grep -v "root" passwd >> tmppasswd
+    mv tmppasswd passwd
+  popd
+  
+  ## create the new image
+  ##
+  [ -f ../initrd.baracus ] && rm ../initrd.baracus
+  find . | cpio --quiet --create --format='newc' > ../initrd.baracus
+popd
 
-cd sbin
-ln -s halt reboot
-cd ..
-cd bin
-ln -s ../usr/bin/busybox.dban ash
-ln -s ../usr/bin/busybox.dban cp
-ln -s ../usr/bin/busybox.dban date
-ln -s ../usr/bin/busybox.dban dd
-ln -s ../usr/bin/busybox.dban dmesg
-ln -s ../usr/bin/busybox.dban echo
-ln -s ../usr/bin/busybox.dban grep
-ln -s ../usr/bin/busybox.dban ls
-ln -s ../usr/bin/busybox.dban mv
-ln -s ../usr/bin/busybox.dban tar
-cd ..
-cd usr/bin
-ln -s ../../usr/bin/busybox.dban clear
-ln -s ../../usr/bin/busybox.dban dwipe
-ln -s ../../usr/bin/busybox.dban sort
-ln -s ../../usr/bin/busybox.dban tr
-ln -s ../../usr/bin/busybox.dban wc
-cd ../..
+pushd $DATADIR
+  gzip initrd.baracus
+  mv initrd.baracus.gz initrd.baracus
+popd
 
-cd etc
-echo "root:Wvg7eFFQQVjbo:14869:0:99999:7:::" > shadow
-echo "root:x:0:0:root:/root:/usr/bin/pxewait" > tmppasswd
-grep -v "root" passwd >> tmppasswd
-mv tmppasswd passwd
-cd ..
-
-## create the new image
-##
-if [ -f ../initrd.baracus ]
-then
-  rm ../initrd.baracus
-fi
-
-find . | cpio --quiet --create --format='newc' > ../initrd.baracus
-cd ..
-gzip initrd.baracus
-mv initrd.baracus.gz initrd.baracus
-
-rm -Rf initrd.dir
+[[ -d $DSTDIR ]] && rm -rf $DSTDIR
 
 ## complete
 ##

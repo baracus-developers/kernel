@@ -11,6 +11,7 @@ echo -ne "Getting network settings via dhcp\n"
 URL="http://$baracus/ba/wipe"
 DBAN_LOG_TMP="/log/dban"
 FILE="$DBAN_LOG_TMP/wipelog"
+REALFILE="$DBAN_LOG_TMP/dwipe.txt"
 
 # Strip the heading and tailing quotes from the syslinux.cfg variable.
 DBAN_NUKE=`echo $nuke | sed -e 's/^"//' | sed -e 's/"$//'`
@@ -93,6 +94,8 @@ dbanLog "dwipe called as $DBAN_NUKE"
 dbanLog "Wipe started at $DBAN_START"
 $DBAN_NUKE
 DBAN_RESULT=$?
+
+cat $REALFILE >> $FILE
 
 DBAN_FINISH=`date '+%a %b %d %T %Y'`
 dbanLog "Wipe completed at $DBAN_FINISH"
