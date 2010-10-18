@@ -31,20 +31,21 @@ pushd $DSTDIR
   
   ## copy over the baracus data
   ##
-  cp ../pxewait usr/bin/pxewait
-  cp ../busybox.dban usr/bin/busybox.dban
-  cp ../baracus.dban usr/bin/baracus.dban
-  cp ../baracus.image usr/bin/baracus.image
-  cp ../baracus.register usr/bin/baracus.register
-  cp ../lshw-static.linux.ix86 usr/bin/lshw-static.linux.ix86
-  cp ../halt sbin/halt
-  cp ../dropbear sbin/dropbear
+  cp ../pxewait usr/bin/.
+  cp ../busybox.dban usr/bin/.
+  cp ../baracus.dban usr/bin/.
+  cp ../baracus.image usr/bin/.
+  cp ../baracus.register usr/bin/.
+  cp ../lshw-static.linux.ix86 usr/bin/.
+  cp ../lshw-static.B.02.15 usr/bin/.
+  cp ../halt sbin/.
+  cp ../dropbear sbin/.
   mkdir -p log/dban
   cp -r ../terminfo usr/share/.
   mkdir -p etc/dropbear
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
-  cp ../shells etc/shells
+  cp ../shells etc/.
   
   pushd usr
     ln -s . i386-linux-uclibc

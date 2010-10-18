@@ -17,9 +17,13 @@ URL="http://$baracus/ba/inventory"
 echo -ne "collecting inventory information\n"
 
 ## Create xml inventory file - eis static works ver 0.2.10
-/usr/bin/lshw-static.linux.ix86 -xml > $FILE
-#/usr/bin/lshw-static -xml > $FILE
-#hwinfo > $FILE
+INV="lshw"
+if [[ "$INV" == "lshw" ]]; then
+  /usr/bin/lshw-static.linux.ix86 -xml > $FILE
+#  /usr/bin/lshw-static_B.02.15 -xml > $FILE
+else
+  /usr/sbin/hwinfo --all > $FILE
+fi
 
 echo -ne "uploading inventory file to $baracus ...\n"
 
