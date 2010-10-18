@@ -3,11 +3,12 @@
 
 Summary:   Files needed to perform independent baracus tasks
 Name:      %{sname}-kernel
-Version:   1.6.0
+Version:   1.6.1
 Release:   0
 Group:     System/Services
 License:   GPLv2 or Artistic V2
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
+BuildArch: noarch
 Source6:   initrd.%{sname}
 Source7:   linux.%{sname}
 
@@ -33,7 +34,3 @@ rm -rf %{buildroot}
 %{_datadir}/%{sname}*
 
 %changelog
-* Tue Sep 14 2010 dbahi@novell - 1.6.0
-- bado image support
-* Tue Jun 15 2010 dbahi@novell - 1.4.0
-- baracus, baracus-kernel, baracus-webserver packages

@@ -1,0 +1,17 @@
+-------------------------------------------------------------------
+Mon Oct 18 01:18:43 UTC 2010 - dbahi@novell.com
+
+- 1.6.1
+- fixes for workload deployment and pxewait now has a shell
+
+-------------------------------------------------------------------
+* Tue Sep 14 00:0:0 UTC 2010 dbahi@novell.com
+
+- 1.6.0
+- bado image support
+
+-------------------------------------------------------------------
+* Tue Jun 15 00:00:00 UTC 2010 dbahi@novell.com
+
+- 1.4.0
+- baracus, baracus-kernel, baracus-webserver packages
