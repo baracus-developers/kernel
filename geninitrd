@@ -35,6 +35,7 @@ pushd $DSTDIR
   cp ../busybox.dban usr/bin/.
   cp ../baracus.dban usr/bin/.
   cp ../baracus.image usr/bin/.
+  cp ../baracus.mcast usr/bin/.
   cp ../baracus.register usr/bin/.
   cp ../lshw-static.linux.ix86 usr/bin/.
   cp ../lshw-static.B.02.15 usr/bin/.
@@ -46,6 +47,7 @@ pushd $DSTDIR
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
   cp ../shells etc/.
+  cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
   
   pushd usr
     ln -s . i386-linux-uclibc
@@ -56,6 +58,8 @@ pushd $DSTDIR
   popd
   
   pushd bin
+    ln -s ../usr/bin/busybox.udpcast udp-receiver
+    ln -s ../usr/bin/busybox.udpcast udp-sender
     ln -s ../usr/bin/busybox.dban ash
     ln -s ../usr/bin/busybox.dban cp
     ln -s ../usr/bin/busybox.dban date
