@@ -3,6 +3,9 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
+export macaddr=`/sbin/ifconfig br0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+
 keeper()
 {
 return
@@ -11,6 +14,10 @@ return
 menu()
 {
 echo "#########################################"
+echo "## MAC: $macaddr          ##"
+echo "## IP:  $ipaddr               ##"
+echo "##                                     ##"
+echo "##-------------------------------------##"
 echo "## Baracus pxewait shell               ##"
 echo "##                                     ##"
 echo "## 1 - reboot                          ##"
@@ -25,6 +32,10 @@ then
   mount -t devpts devpts /dev/pts
   sleep 5
   /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+
+  PARAMS="mac=$mac&ip=$ipaddr"
+  URL="http://$baracus/ba/pxewaitr?$PARAMS"
+  /usr/bin/curl $URL
 fi
 
 echo "" > /tmp/flag
