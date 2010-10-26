@@ -10,16 +10,15 @@ return
 
 menu()
 {
-echo ""
-echo "MAC: $macaddr"
-echo "IP:  $ipaddr"
-echo ""
-echo "##-------------------------------------##"
-echo "## Baracus pxewait shell               ##"
-echo "##                                     ##"
-echo "## 1 - reboot                          ##"
-echo "## 2 - disconnect                      ##"
-echo "##-------------------------------------##"
+echo 
+echo "Local  MAC: $macaddr"
+echo "Local  IP:  $ipaddr"
+echo "-------------------------------------"
+echo "| Baracus pxewait shell             |"
+echo "|                                   |"
+echo "| 1 - reboot                        |"
+echo "| 2 - disconnect                    |"
+echo "-------------------------------------"
 }
 
 if [ ! -f /tmp/flag ]
