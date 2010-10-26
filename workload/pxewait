@@ -3,9 +3,6 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
-export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
-export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
-
 keeper()
 {
 return
@@ -13,16 +10,16 @@ return
 
 menu()
 {
-echo "#########################################"
-echo "## MAC: $macaddr          ##"
-echo "## IP:  $ipaddr               ##"
-echo "##                                     ##"
+echo ""
+echo "MAC: $macaddr"
+echo "IP:  $ipaddr"
+echo ""
 echo "##-------------------------------------##"
 echo "## Baracus pxewait shell               ##"
 echo "##                                     ##"
 echo "## 1 - reboot                          ##"
 echo "## 2 - disconnect                      ##"
-echo "#########################################"
+echo "##-------------------------------------##"
 }
 
 if [ ! -f /tmp/flag ]
@@ -37,6 +34,9 @@ then
   URL="http://$baracus/ba/pxewaitr?$PARAMS"
   /usr/bin/curl $URL
 fi
+
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
+export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
 
 echo "" > /tmp/flag
 clear
