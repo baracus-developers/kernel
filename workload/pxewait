@@ -4,7 +4,7 @@ trap 'keeper' 2
 trap 'keeper' 20
 
 export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
-export macaddr=`/sbin/ifconfig br0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
 
 keeper()
 {
