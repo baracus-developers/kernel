@@ -1,0 +1,108 @@
+#!/bin/bash
+
+trap 'keeper' 2
+trap 'keeper' 20
+
+keeper()
+{
+return
+}
+
+menu()
+{
+echo 
+echo "Local MAC: $macaddr"
+echo "Local IP:  $ipaddr"
+echo "Specified Disk: $baimagesrc"
+echo "Specified Image Name: $baimagedst"
+echo "-------------------------------------"
+echo "| Baracus pxewait shell             |"
+echo "|                                   |"
+echo "| 1 - clone system                  |"
+echo "| 2 - reboot                        |"
+echo "| 3 - shutdown                      |"
+echo "| 4 - disconnect                    |"
+echo "-------------------------------------"
+}
+
+if [ ! -f /tmp/flag ]
+then
+  echo -ne "Getting network settings via dhcp\n"
+  /sbin/dhcpcd -t60 eth0
+  mount -t devpts devpts /dev/pts
+  sleep 5
+  /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+fi
+
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
+export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+
+echo "" > /tmp/flag
+clear
+menu
+while :
+do
+  echo -ne "> "
+  read selection
+  case $selection in
+  1)
+    echo "cloning $baimagesrc ..."
+    STATUS="pass"
+
+    ## Create FILE
+    echo "Starting..." > $FILE
+    date >> $FILE
+    echo "golden host: $macaddr" >> $FILE
+    echo "raw disk: $baimagesrc" >> $FILE
+    echo "image name:  $baimagedst" >> $FILE
+
+    /usr/sbin/hwinfo --disk --short > /tmp/hwinfo.disk
+    /bin/grep $baimagesrc /tmp/hwinfo.disk
+    if [[ $? -ne 0 ]]; then
+      echo -ne "target disk device not found: $baimagesrc" >> $FILE
+      /bin/cat /tmp/hwinfo.disk >> $FILE
+      STATUS="fail"
+    fi
+
+    if [[ "$STATUS" == "pass" ]]; then
+      URL="http://$baracus/ba/clone"
+      COOKIE="mac=$mac;filename=$baimagedst"
+      /bin/dd if=/dev/$baimagesrc | /usr/bin/curl -b $COOKIE --url $URL -d @-
+     if [[ $? -ne 0 ]]; then
+        echo "failure - exit code $? - msg $!" >> $FILE
+        STATUS="fail"
+      else
+        echo "Successfully uploaded cloned image" >> $FILE
+      fi
+    fi
+
+    STATUS="mac=$mac;status=$STATUS"
+    /usr/bin/curl -b $STATUS -T $FILE http://$baracus/ba/clonelog
+  ;;
+  2)
+    echo "rebooting..."
+    /sbin/reboot -f
+  ;;
+  3)
+    echo "shutting down..."
+    /sbin/halt -f -p
+  ;;
+  4)
+    if [[ x"$TERM" != x"linux" ]]
+    then
+      echo "disconnecting..."
+      exit
+    else
+      clear
+      menu
+    fi
+  ;;
+  8675309)
+    /bin/bash
+  ;;
+  *)
+    echo "invalid selection"
+  ;;
+  esac
+done
+

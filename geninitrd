@@ -36,6 +36,7 @@ pushd $DSTDIR
   cp ../baracus.dban usr/bin/.
   cp ../baracus.image usr/bin/.
   cp ../baracus.mcast usr/bin/.
+  cp ../baracus.clone usr/bin/.
   cp ../baracus.register usr/bin/.
   cp ../lshw-static.linux.ix86 usr/bin/.
   cp ../lshw-static.B.02.15 usr/bin/.
