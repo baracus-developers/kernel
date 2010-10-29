@@ -14,7 +14,7 @@ echo "disk:  $baimagedst" >> $FILE
 
 IMAGE=http://$baracus/var/spool/baracus/images/$baimagesrc
 
-/usr/bin/curl --head $IMAGE > /tmp/curl.head
+/usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
 if [[ $? -ne 0 ]]; then
     echo "file requested not found: $IMAGE" >> $FILE
     /bin/cat /tmp/curl.head >> $FILE

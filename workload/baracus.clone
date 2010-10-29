@@ -16,7 +16,7 @@ echo "Local IP:  $ipaddr"
 echo "Specified Disk: $baimagesrc"
 echo "Specified Image Name: $baimagedst"
 echo "-------------------------------------"
-echo "| Baracus pxewait shell             |"
+echo "| Baracus command shell             |"
 echo "|                                   |"
 echo "| 1 - clone system                  |"
 echo "| 2 - reboot                        |"
@@ -48,6 +48,7 @@ do
   1)
     echo "cloning $baimagesrc ..."
     STATUS="pass"
+    FILE=/tmp/clone.log
 
     ## Create FILE
     echo "Starting..." > $FILE
@@ -56,8 +57,19 @@ do
     echo "raw disk: $baimagesrc" >> $FILE
     echo "image name:  $baimagedst" >> $FILE
 
+
+    IMAGE=http://$baracus/var/spool/baracus/images/$baimagedst
+
+    /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
+    /bin/grep -i "Not Found" /tmp/curl.head >& /dev/null
+    if [[ $? -ne 0 ]]; then
+        echo "Image file target found - refusing to overwrite: $IMAGE" >> $FILE
+        /bin/cat /tmp/curl.head >> $FILE
+        STATUS="fail"
+    fi
+
     /usr/sbin/hwinfo --disk --short > /tmp/hwinfo.disk
-    /bin/grep $baimagesrc /tmp/hwinfo.disk
+    /bin/grep $baimagesrc /tmp/hwinfo.disk >& /dev/null
     if [[ $? -ne 0 ]]; then
       echo -ne "target disk device not found: $baimagesrc" >> $FILE
       /bin/cat /tmp/hwinfo.disk >> $FILE
@@ -67,8 +79,8 @@ do
     if [[ "$STATUS" == "pass" ]]; then
       URL="http://$baracus/ba/clone"
       COOKIE="mac=$mac;filename=$baimagedst"
-      /bin/dd if=/dev/$baimagesrc | /usr/bin/curl -b $COOKIE --url $URL -d @-
-     if [[ $? -ne 0 ]]; then
+      /bin/dd if=$baimagesrc bs=1024 | /usr/bin/curl -b $COOKIE --url $URL  -T -
+      if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
       else
@@ -76,8 +88,12 @@ do
       fi
     fi
 
-    STATUS="mac=$mac;status=$STATUS"
-    /usr/bin/curl -b $STATUS -T $FILE http://$baracus/ba/clonelog
+    COOKIE2="mac=$mac;status=$STATUS"
+    /usr/bin/curl -b $COOKIE2 -T $FILE http://$baracus/ba/clonelog
+
+    sleep 5
+    echo "rebooting..."
+    /sbin/reboot -f
   ;;
   2)
     echo "rebooting..."
