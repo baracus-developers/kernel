@@ -32,6 +32,7 @@ then
   mount -t devpts devpts /dev/pts
   sleep 5
   /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+  echo "baracus.clone" > /tmp/sshshell
 fi
 
 export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`

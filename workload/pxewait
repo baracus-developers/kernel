@@ -11,13 +11,14 @@ return
 menu()
 {
 echo 
-echo "Local  MAC: $macaddr"
-echo "Local  IP:  $ipaddr"
+echo "Local MAC: $macaddr"
+echo "Local IP:  $ipaddr"
 echo "-------------------------------------"
 echo "| Baracus pxewait shell             |"
 echo "|                                   |"
 echo "| 1 - reboot                        |"
-echo "| 2 - disconnect                    |"
+echo "| 2 - shutdown                      |"
+echo "| 3 - disconnect                    |"
 echo "-------------------------------------"
 }
 
@@ -28,6 +29,8 @@ then
   mount -t devpts devpts /dev/pts
   sleep 5
   /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+
+  echo "pxewait" > /tmp/sshshell
 
   PARAMS="mac=$mac&ip=$ipaddr"
   URL="http://$baracus/ba/pxewaitr?$PARAMS"
@@ -50,6 +53,10 @@ do
     /sbin/reboot -f
   ;;
   2)
+    echo "shutting down..."
+    /sbin/halt -p -n -f
+  ;;
+  3)
     if [[ x"$TERM" != x"linux" ]]
     then
       echo "disconnecting..."

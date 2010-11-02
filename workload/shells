@@ -3,4 +3,4 @@
 /bin/sh
 /bin/true
 /usr/bin/passwd
-/usr/bin/pxewait
+/usr/bin/shellexec

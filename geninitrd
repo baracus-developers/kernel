@@ -49,6 +49,7 @@ pushd $DSTDIR
   chown root:root etc/dropbear/dropbear_rsa_host_key
   cp ../shells etc/.
   cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
+  cp ../shellexec usr/bin/.
   
   pushd usr
     ln -s . i386-linux-uclibc
@@ -83,7 +84,7 @@ pushd $DSTDIR
   
   pushd etc
     echo "root:Wvg7eFFQQVjbo:14869:0:99999:7:::" > shadow
-    echo "root:x:0:0:root:/root:/usr/bin/pxewait" > tmppasswd
+    echo "root:x:0:0:root:/root:/usr/bin/shellexec" > tmppasswd
     grep -v "root" passwd >> tmppasswd
     mv tmppasswd passwd
   popd

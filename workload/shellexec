@@ -1,0 +1,20 @@
+#!/bin/bash
+
+trap 'keeper' 2
+trap 'keeper' 20
+
+keeper()
+{
+return
+}
+
+SWITCH=`cat /tmp/sshshell`
+
+case $SWITCH in
+  "pxewait")
+   exec /usr/bin/pxewait
+   ;;
+   "baracus.clone")
+   exec /usr/bin/baracus.clone
+   ;;
+esac
