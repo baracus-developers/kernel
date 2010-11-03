@@ -5,48 +5,28 @@ trap 'keeper' 20
 
 keeper()
 {
-return
+    return
 }
 
 menu()
 {
-echo 
-echo "Local MAC: $macaddr"
-echo "Local IP:  $ipaddr"
-echo "Specified Disk: $baimagesrc"
-echo "Specified Image Name: $baimagedst"
-echo "-------------------------------------"
-echo "| Baracus command shell             |"
-echo "|                                   |"
-echo "| 1 - clone system                  |"
-echo "| 2 - reboot                        |"
-echo "| 3 - shutdown                      |"
-echo "| 4 - disconnect                    |"
-echo "-------------------------------------"
+    echo 
+    echo "Local MAC: $macaddr"
+    echo "Local IP:  $ipaddr"
+    echo "Specified Disk: $baimagesrc"
+    echo "Specified Image Name: $baimagedst"
+    echo "-------------------------------------"
+    echo "| Baracus command shell             |"
+    echo "|                                   |"
+    echo "| 1 - clone system                  |"
+    echo "| 2 - reboot                        |"
+    echo "| 3 - shutdown                      |"
+    echo "| 4 - disconnect                    |"
+    echo "-------------------------------------"
 }
 
-if [ ! -f /tmp/flag ]
-then
-  echo -ne "Getting network settings via dhcp\n"
-  /sbin/dhcpcd -t60 eth0
-  mount -t devpts devpts /dev/pts
-  sleep 5
-  /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
-  echo "baracus.clone" > /tmp/sshshell
-fi
-
-export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
-export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
-
-echo "" > /tmp/flag
-clear
-menu
-while :
-do
-  echo -ne "> "
-  read selection
-  case $selection in
-  1)
+clone()
+{
     echo "cloning $baimagesrc ..."
     STATUS="pass"
     FILE=/tmp/clone.log
@@ -78,9 +58,7 @@ do
     fi
 
     if [[ "$STATUS" == "pass" ]]; then
-      URL="http://$baracus/ba/clone"
-      COOKIE="mac=$mac;filename=$baimagedst"
-      /bin/dd if=$baimagesrc bs=1024 | /usr/bin/curl -b $COOKIE --url $URL  -T -
+       /bin/dd if=$baimagesrc | /usr/bin/busybox.dban gzip | /usr/bin/dbclient clone@$baracus "gzip -d | /usr/bin/sparsefile -o $baimagedst | gzip"
       if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
@@ -95,6 +73,37 @@ do
     sleep 5
     echo "rebooting..."
     /sbin/reboot -f
+}
+
+if [ ! -f /tmp/flag ]
+then
+  echo -ne "Getting network settings via dhcp\n"
+  /sbin/dhcpcd -t60 eth0
+  mount -t devpts devpts /dev/pts
+  sleep 5
+  /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+  echo "baracus.clone" > /tmp/sshshell
+fi
+
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
+export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+
+echo "" > /tmp/flag
+
+clear
+if [[ $autoclone -eq 1 ]]; then
+  clone
+else
+  menu
+fi
+
+while :
+do
+  echo -ne "> "
+  read selection
+  case $selection in
+  1)
+    clone
   ;;
   2)
     echo "rebooting..."

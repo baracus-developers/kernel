@@ -40,6 +40,7 @@ pushd $DSTDIR
   cp ../baracus.register usr/bin/.
   cp ../lshw-static.linux.ix86 usr/bin/.
   cp ../lshw-static.B.02.15 usr/bin/.
+  cp ../dbclient usr/bin/.
   cp ../halt sbin/.
   cp ../dropbear sbin/.
   mkdir -p log/dban
