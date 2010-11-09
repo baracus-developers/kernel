@@ -39,7 +39,7 @@ clone()
     echo "image name:  $baimagedst" >> $FILE
 
 
-    IMAGE=http://$baracus/var/spool/baracus/images/$baimagedst
+    IMAGE=http://$baracus/var/spool/baracus/images/$baimagedst.gz
 
     /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
     /bin/grep -i "Not Found" /tmp/curl.head >& /dev/null
@@ -58,7 +58,7 @@ clone()
     fi
 
     if [[ "$STATUS" == "pass" ]]; then
-       /bin/dd if=$baimagesrc | /usr/bin/busybox.dban gzip | /usr/bin/dbclient clone@$baracus "gzip -d | /usr/bin/sparsefile -o $baimagedst | gzip"
+       /bin/dd if=$baimagesrc | /bin/gzip | /usr/bin/dbclient -i /.ssh/id_rsa.db baracus@$baracus "gzip -d | sparsefile > images/$baimagedst && gzip images/$baimagedst"
       if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"

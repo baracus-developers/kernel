@@ -12,13 +12,21 @@ date >> $FILE
 echo "image: $baimagesrc" >> $FILE
 echo "disk:  $baimagedst" >> $FILE
 
-IMAGE=http://$baracus/var/spool/baracus/images/$baimagesrc
+IMAGE=http://$baracus/var/spool/baracus/images/${baimagesrc}.gz
 
 /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
+/bin/grep "HTTP/" /tmp/curl.head | /bin/grep "OK"
 if [[ $? -ne 0 ]]; then
-    echo "file requested not found: $IMAGE" >> $FILE
+    echo "gzip of file requested not found: $IMAGE" >> $FILE
     /bin/cat /tmp/curl.head >> $FILE
-    STATUS="fail"
+    IMAGE=http://$baracus/var/spool/baracus/images/$baimagesrc
+    /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
+    /bin/grep "HTTP/" /tmp/curl.head | /bin/grep "OK"
+    if [[ $? -ne 0 ]]; then
+        echo "file requested not found: $IMAGE" >> $FILE
+        /bin/cat /tmp/curl.head >> $FILE
+        STATUS="fail"
+    fi
 fi
 
 # no reason to fail there and not here too if the disk is also bad tell them
@@ -33,7 +41,11 @@ fi
 
 if [[ "$STATUS" == "pass" ]]; then
     echo -ne "Deploying image\n"
-    /usr/bin/curl $IMAGE | dd of=$baimagedst
+    if [[ $IMAGE =~ .*\.gz$ ]]; then
+        /usr/bin/curl $IMAGE | /bin/gzip -d | /bin/dd of=$baimagedst
+    else 
+        /usr/bin/curl $IMAGE | dd of=$baimagedst
+    fi
     if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
