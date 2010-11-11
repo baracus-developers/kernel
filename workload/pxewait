@@ -3,6 +3,29 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
+if [ ! -f /tmp/flag ]
+then
+    echo "" > /tmp/flag
+    echo -ne "Getting network settings via dhcp\n"
+    /sbin/dhcpcd -t60 eth0
+    mount -t devpts devpts /dev/pts
+    sleep 5
+    /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
+
+    echo "pxewait" > /tmp/sshshell
+
+    # notify the baracus server the node is in pxewaitr
+    PARAMS="mac=$mac&ip=$ipaddr"
+    URL="http://$baracus/ba/pxewaitr?$PARAMS"
+    /usr/bin/curl $URL
+fi
+
+
+export baracus=`cat /proc/cmdline    | sed -re 's/^.* baracus=([^ ]*).*$/\1/'`
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
+export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+
+
 keeper()
 {
 return
@@ -13,6 +36,7 @@ menu()
 echo 
 echo "Local MAC: $macaddr"
 echo "Local IP:  $ipaddr"
+echo "Baracus Host: $baracus"
 echo "-------------------------------------"
 echo "| Baracus pxewait shell             |"
 echo "|                                   |"
@@ -22,25 +46,6 @@ echo "| 3 - disconnect                    |"
 echo "-------------------------------------"
 }
 
-if [ ! -f /tmp/flag ]
-then
-  echo -ne "Getting network settings via dhcp\n"
-  /sbin/dhcpcd -t60 eth0
-  mount -t devpts devpts /dev/pts
-  sleep 5
-  /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
-
-  echo "pxewait" > /tmp/sshshell
-
-  PARAMS="mac=$mac&ip=$ipaddr"
-  URL="http://$baracus/ba/pxewaitr?$PARAMS"
-  /usr/bin/curl $URL
-fi
-
-export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
-export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
-
-echo "" > /tmp/flag
 clear
 menu
 while :
@@ -68,6 +73,7 @@ do
   ;;
   8675309)
     /bin/bash
+    menu
   ;;
   *)
     echo "invalid selection"
