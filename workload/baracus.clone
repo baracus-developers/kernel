@@ -3,6 +3,10 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
+baimagesrc=`cat /proc/cmdline | sed -e 's/^.*baimagesrc=\"//' | sed -e 's/\".*$//'`
+baimagedst=`cat /proc/cmdline | sed -e 's/^.*baimagedst=\"//' | sed -e 's/\".*$//'`
+baracus=`cat /proc/cmdline | sed -e 's/^.*baracus=//' | sed -e 's/\s.*$//'`
+
 keeper()
 {
     return
@@ -67,7 +71,7 @@ clone()
       fi
     fi
 
-    COOKIE2="mac=$mac;status=$STATUS"
+    COOKIE2="mac=$macaddr;status=$STATUS"
     /usr/bin/curl -b $COOKIE2 -T $FILE http://$baracus/ba/clonelog
 
     sleep 5
