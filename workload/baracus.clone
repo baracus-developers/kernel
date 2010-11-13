@@ -3,6 +3,15 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
+# weird that we don't ahve these in all our shells ... extract
+
+export baimagesrc=`sed -re 's/^.* baimagesrc="?([^ "]*).*$/\1/' /proc/cmdline`
+export baimagedst=`sed -re 's/^.* baimagedst="?([^ "]*).*$/\1/' /proc/cmdline`
+export baracus=`sed -re 's/^.* baracus=([^ ]*).*$/\1/' /proc/cmdline`
+export macaddr=`sed -re 's/^.* mac=([^ ]*).*$/\1/' /proc/cmdline`
+
+FILE=/tmp/clone.log
+
 if [[ ! -f /tmp/flag ]]; then
     echo "" > /tmp/flag
     echo -ne "Getting network settings via dhcp\n"
@@ -11,13 +20,17 @@ if [[ ! -f /tmp/flag ]]; then
     sleep 5
     /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
     echo "baracus.clone" > /tmp/sshshell
+
+    # notify the baracus server the node is clone running/ready
+    PARAMS="mac=$macaddr"
+    URL="http://$baracus/ba/cloner?$PARAMS"
+    /usr/bin/curl $URL
 fi
 
-export baimagesrc=`cat /proc/cmdline | sed -re 's/^.* baimagesrc="?([^ "]*).*$/\1/'`
-export baimagedst=`cat /proc/cmdline | sed -re 's/^.* baimagedst="?([^ "]*).*$/\1/'`
-export baracus=`cat /proc/cmdline    | sed -re 's/^.* baracus=([^ ]*).*$/\1/'`
-export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" | sed -e 's/^.*addr://' | sed -e 's/Bcast.*$//'`
-export macaddr=`/sbin/ifconfig eth0 | grep "HWaddr" | sed -e 's/^.*HWaddr //'`
+# get the IP we were DHCP'd
+
+export ipaddr=`/sbin/ifconfig eth0 | grep "inet addr" |sed -re 's/^.* inet addr:([^ ]*).*$/\1/'`
+export chkmac=`/sbin/ifconfig eth0 | grep "HWaddr" |sed -re 's/^.* HWaddr ([^ ]*).*$/\1/'`
 
 keeper()
 {
@@ -28,6 +41,9 @@ menu()
 {
     echo 
     echo "Local MAC: $macaddr"
+    if [[ "$macaddr" != "$chkmac" ]]; then
+        echo "Oddly eth0 MAC is different: $chkmac"
+    fi
     echo "Local IP:  $ipaddr"
     echo "Baracus Host: $baracus"
     echo "Specified Disk: $baimagesrc"
@@ -35,7 +51,11 @@ menu()
     echo "-------------------------------------"
     echo "| Baracus command shell             |"
     echo "|                                   |"
-    echo "| 1 - clone system                  |"
+    if [[ -f $FILE ]]; then
+        echo "| 1 - clone of system in progress   |"
+    else
+        echo "| 1 - clone system                  |"
+    fi
     echo "| 2 - reboot                        |"
     echo "| 3 - shutdown                      |"
     echo "| 4 - disconnect                    |"
@@ -46,7 +66,6 @@ clone()
 {
     echo "cloning $baimagesrc ..."
     STATUS="pass"
-    FILE=/tmp/clone.log
 
     if [[ -f $FILE ]]; then
         # barf as someone is trying to kick off a 2nd clone while one is going
@@ -102,9 +121,9 @@ clone()
 
 clear
 if [[ $autoclone -eq 1 ]]; then
-  clone
+    clone
 else
-  menu
+    menu
 fi
 
 while :
