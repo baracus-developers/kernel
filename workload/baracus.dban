@@ -8,6 +8,10 @@
 echo -ne "Getting network settings via dhcp\n"
 /sbin/dhcpcd -t60 eth0
 
+# remove these confusing /dev/loop ro mounts so we don't try to wipe them
+umount /parts/mp_0000
+umount /parts/mp_0001
+
 URL="http://$baracus/ba/wipe"
 DBAN_LOG_TMP="/log/dban"
 FILE="$DBAN_LOG_TMP/wipelog"

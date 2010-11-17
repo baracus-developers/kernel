@@ -16,7 +16,10 @@ popd()
 DATADIR=workload
 DSTDIR=$DATADIR/initrd.dir
 INITRD_IMG=$1
-[ "$INITRD_IMG" == "" ] && INITRD_IMG=initrd.opensuse-11.2
+[ "$INITRD_IMG" == "" ] && INITRD_IMG=initrd.opensuse-11.3
+
+echo "using initrd: $INITRD_IMG"
+
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
 mkdir -p $DSTDIR
 cp $DATADIR/$INITRD_IMG $DSTDIR
@@ -40,8 +43,7 @@ pushd $DSTDIR
   cp ../baracus.mcast usr/bin/.
   cp ../baracus.clone usr/bin/.
   cp ../baracus.register usr/bin/.
-  cp ../lshw-static.linux.ix86 usr/bin/.
-  cp ../lshw-static.B.02.15 usr/bin/.
+  cp ../lshw-static.B.02.15.x86 usr/bin/.
   cp ../dbclient usr/bin/.
   cp ../halt sbin/.
   cp ../dropbear sbin/.
@@ -104,7 +106,7 @@ pushd $DATADIR
   mv initrd.baracus.gz initrd.baracus
 popd
 
-#[[ -d $DSTDIR ]] && rm -rf $DSTDIR
+[[ -d $DSTDIR ]] && rm -rf $DSTDIR
 
 ## complete
 ##

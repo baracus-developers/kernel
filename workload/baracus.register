@@ -19,8 +19,7 @@ echo -ne "collecting inventory information\n"
 ## Create xml inventory file - eis static works ver 0.2.10
 INV="lshw"
 if [[ "$INV" == "lshw" ]]; then
-  /usr/bin/lshw-static.linux.ix86 -xml > $FILE
-#  /usr/bin/lshw-static_B.02.15 -xml > $FILE
+  /usr/bin/lshw-static.B.02.15.x86 -xml > $FILE
 else
   /usr/sbin/hwinfo --all > $FILE
 fi
