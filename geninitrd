@@ -15,22 +15,24 @@ popd()
 
 DATADIR=workload
 DSTDIR=$DATADIR/initrd.dir
-
+INITRD_IMG=$1
+[ "$INITRD_IMG" == "" ] && INITRD_IMG=initrd.opensuse-11.2
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
 mkdir -p $DSTDIR
-cp $DATADIR/initrd.opensuse-11.1 $DSTDIR
+cp $DATADIR/$INITRD_IMG $DSTDIR
 
 ## Extract the image
 ##
 
 pushd $DSTDIR
-  mv initrd.opensuse-11.1 initrd.gz
+  mv $INITRD_IMG initrd.gz
   gzip -d initrd.gz
   cpio --quiet -id < initrd 
   rm initrd
   
   ## copy over the baracus data
   ##
+  mkdir -p usr/bin/
   cp ../pxewait usr/bin/.
   cp ../busybox.dban usr/bin/.
   cp ../baracus.dban usr/bin/.
@@ -44,6 +46,7 @@ pushd $DSTDIR
   cp ../halt sbin/.
   cp ../dropbear sbin/.
   mkdir -p log/dban
+  mkdir -p usr/share/
   cp -r ../terminfo usr/share/.
   mkdir -p etc/dropbear
   cp ../dropbear_rsa_host_key etc/dropbear
@@ -101,7 +104,7 @@ pushd $DATADIR
   mv initrd.baracus.gz initrd.baracus
 popd
 
-[[ -d $DSTDIR ]] && rm -rf $DSTDIR
+#[[ -d $DSTDIR ]] && rm -rf $DSTDIR
 
 ## complete
 ##
