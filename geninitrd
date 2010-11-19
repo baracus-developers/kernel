@@ -15,8 +15,8 @@ popd()
 
 DATADIR=workload
 DSTDIR=$DATADIR/initrd.dir
-INITRD_IMG=$1
-[ "$INITRD_IMG" == "" ] && INITRD_IMG=initrd.opensuse-11.3
+[ ! -z "$1" ] && INITRD_IMG=$1 
+[ -z "$INITRD_IMG" ] &&  INITRD_IMG=initrd.opensuse-11.4
 
 echo "using initrd: $INITRD_IMG"
 
@@ -70,13 +70,13 @@ pushd $DSTDIR
     ln -s ../usr/bin/busybox.udpcast udp-sender
     ln -s ../usr/bin/busybox.dban ash
     ln -s ../usr/bin/busybox.dban cp
-    ln -s ../usr/bin/busybox.dban date
+#    ln -s ../usr/bin/busybox.dban date
     ln -s ../usr/bin/busybox.dban dd
     ln -s ../usr/bin/busybox.dban dmesg
     ln -s ../usr/bin/busybox.dban echo
     ln -s ../usr/bin/busybox.dban grep
     ln -s ../usr/bin/busybox.dban ls
-    ln -s ../usr/bin/busybox.dban mv
+#    ln -s ../usr/bin/busybox.dban mv
     ln -s ../usr/bin/busybox.dban tar
   popd
   
@@ -103,11 +103,11 @@ popd
 
 pushd $DATADIR
   gzip initrd.baracus
-  mv initrd.baracus.gz initrd.baracus
+  mv initrd.baracus.gz $INITRD_IMG.baracus
 popd
 
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
 
 ## complete
 ##
-echo "initrd.baracus generation complete"
+echo "$INITRD_IMG.baracus generation complete"
