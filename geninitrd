@@ -70,14 +70,16 @@ pushd $DSTDIR
     ln -s ../usr/bin/busybox.udpcast udp-sender
     ln -s ../usr/bin/busybox.dban ash
     ln -s ../usr/bin/busybox.dban cp
-#    ln -s ../usr/bin/busybox.dban date
     ln -s ../usr/bin/busybox.dban dd
     ln -s ../usr/bin/busybox.dban dmesg
     ln -s ../usr/bin/busybox.dban echo
     ln -s ../usr/bin/busybox.dban grep
     ln -s ../usr/bin/busybox.dban ls
-#    ln -s ../usr/bin/busybox.dban mv
     ln -s ../usr/bin/busybox.dban tar
+    [ "$initrd" == "initrd.opensuse-11.4" ] && \
+	ln -s ../usr/bin/busybox.dban date
+    [ "$initrd" == "initrd.opensuse-11.4" ] && \
+	ln -s ../usr/bin/busybox.dban mv
   popd
   
   pushd usr/bin
