@@ -99,6 +99,9 @@ dbanLog "Wipe started at $DBAN_START"
 $DBAN_NUKE
 DBAN_RESULT=$?
 
+/bin/mount /parts/00_lib /parts/mp_0000 -t squashfs -o loop,ro >&/dev/null
+/bin/mount /parts/01_usr /parts/mp_0001 -t squashfs -o loop,ro >&/dev/null
+
 cat $REALFILE >> $FILE
 
 DBAN_FINISH=`date '+%a %b %d %T %Y'`
@@ -129,5 +132,5 @@ echo "Hardware clock operation start date:  $DBAN_START"
 echo "Hardware clock operation finish date: $DBAN_FINISH"
 
 /usr/bin/curl -b $COOKIE -T $FILE $URL
- 
+
 /sbin/halt -p -n -f
