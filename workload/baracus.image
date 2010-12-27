@@ -18,13 +18,13 @@ IMAGE=http://$baracus/var/spool/baracus/images/${baimagesrc}.gz
 /bin/grep "HTTP/" /tmp/curl.head | /bin/grep "OK"
 if [[ $? -ne 0 ]]; then
     echo "gzip of file requested not found: $IMAGE" >> $FILE
-    /bin/cat /tmp/curl.head >> $FILE
+    echo "now looking for non-gziped file" >> $FILE
     IMAGE=http://$baracus/var/spool/baracus/images/$baimagesrc
     /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
     /bin/grep "HTTP/" /tmp/curl.head | /bin/grep "OK"
     if [[ $? -ne 0 ]]; then
         echo "file requested not found: $IMAGE" >> $FILE
-        /bin/cat /tmp/curl.head >> $FILE
+#        /bin/cat /tmp/curl.head >> $FILE
         STATUS="fail"
     fi
 fi
