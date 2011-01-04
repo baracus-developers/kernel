@@ -139,9 +139,10 @@ cfglines=cfgfile.readlines()
 # check whether we should drop to localboot
 # XXX should really check that localboot is the default
 localbootre=re.compile("\s*localboot\w*")
+chainre=re.compile(".*chain.c32")
 
 for line in cfglines:
-    if (localbootre.match(line)):
+    if (localbootre.match(line) or chainre.match(line)):
         print "pypxeboot: dropping to pygrub for local boot"
         run_pygrub()
         sys.exit(0)
