@@ -1,4 +1,29 @@
 -------------------------------------------------------------------
+Thu Jan  6 20:59:47 UTC 2011 - dbahi@novell.com
+
+- corrections to pxewait and clone worloads for /dev/pts
+
+-------------------------------------------------------------------
+Fri Dec 17 15:10:01 UTC 2010 - dbahi@novell.com
+
+- now using opensuse 11.3 kernel/initrd for workload management
+- tweaks to multicast image deployment (always expects image to be gz)
+- image logging does not include curl head output (cleanup)
+- dban / diskwipe working again with clicfs (introduced in 11.2 M1)
+
+-------------------------------------------------------------------
+Sat Nov 13 01:57:14 UTC 2010 - dbahi@novell.com
+
+- more workload mods for clone and pxewait and other hooks
+
+-------------------------------------------------------------------
+Thu Nov 11 02:13:25 UTC 2010 - dbahi@novell.com
+
+- 1.6.2
+- image supports gz
+- clone of node drives now supported
+
+-------------------------------------------------------------------
 Mon Oct 18 01:18:43 UTC 2010 - dbahi@novell.com
 
 - 1.6.1
