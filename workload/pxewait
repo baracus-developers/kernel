@@ -13,6 +13,7 @@ then
     echo "" > /tmp/flag
     echo -ne "Getting network settings via dhcp\n"
     /sbin/dhcpcd -t60 eth0
+    mkdir /dev/pts
     mount -t devpts devpts /dev/pts
     sleep 5
     /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
