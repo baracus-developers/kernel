@@ -120,9 +120,7 @@ tmpdir="/var/lib/xen/"
 
 os.chdir(tmpdir)
 #commandstr="tftp "+servaddr+" -c get pxelinux.cfg/"+hexip
-#commandstr="wget -O " + tmpdir+hexip + " http://baracus-vm/ba/boot?mac=00:16:3e:00:00:a1&ip=172.17.1.245"
-#commandstr="wget -O " + tmpdir+hexip + " http://"+servaddr+"/ba/boot?mac="+mac+"&ip="+ipaddr+"&arch=xen"
-commandstr="wget -O " + tmpdir+hexip + " http://"+servaddr+"/ba/boot?mac="+mac+"&ip="+ipaddr+"&arch=xen"
+commandstr="wget -O " + tmpdir+hexip + " 'http://"+servaddr+"/ba/boot?mac="+mac+"&ip="+ipaddr+"&arch=xen'"
 #print "running command "+commandstr
 getpxeres=commands.getstatusoutput(commandstr)
 
