@@ -119,9 +119,7 @@ print "pypxeboot: getting cfg for IP %s (%s) from server %s" %(ipaddr,hexip,serv
 tmpdir="/var/lib/xen/"
 
 os.chdir(tmpdir)
-#commandstr="tftp "+servaddr+" -c get pxelinux.cfg/"+hexip
 commandstr="wget -O " + tmpdir+hexip + " 'http://"+servaddr+"/ba/boot?mac="+mac+"&ip="+ipaddr+"&arch=xen'"
-#print "running command "+commandstr
 getpxeres=commands.getstatusoutput(commandstr)
 
 # check for errors in tftp output -- it doesn't use return codes properly!
@@ -171,8 +169,6 @@ for line in cfglines:
         elif (appendre.match(line)):
             havekernelargs=True
             for entry in line[6:].split():
-#		print entry
-#		print entry.find('=')
 		for item in entry.split(',')[0:]:
 		    if (item.find('=') != -1):
 			(k,v)=entry.split('=', 1)
@@ -187,9 +183,6 @@ dlres={}
 tmpimages={}
 for i in ["initrd","kernel"]:
     (tfd,tfn)=tempfile.mkstemp(prefix=i+".", dir=tmpdir)
-#    cmd="tftp "+servaddr+" -c get "+syslinux[i]+" "+tfn
-    print "tfn "+tfn
-    print "syslinux "+syslinux[i]+" "
     cmd="wget -O "+tfn+" "+syslinux[i]
     tmpimages[i]=tfn
     print "pypxeboot: downloading "+i+" using cmd: "+cmd
