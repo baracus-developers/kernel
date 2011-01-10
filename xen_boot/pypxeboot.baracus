@@ -17,7 +17,7 @@
 
 import commands,sys,re,os,getopt,tempfile,shutil
 
-udhcpc_command="/usr/bin/udhcpc"
+udhcpc_command="/sbin/udhcpc"
 udhcpc_script="/usr/share/udhcpc/outputpy.udhcp.sh"
 havekernelargs=False
 
