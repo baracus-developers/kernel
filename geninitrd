@@ -33,7 +33,7 @@ pushd $DSTDIR
   cpio --quiet -id < initrd 
   rm initrd
   
-  ## copy over the baracus data
+  ## copy-in the baracus data
   ##
   mkdir -p usr/bin/
   cp ../pxewait usr/bin/.
