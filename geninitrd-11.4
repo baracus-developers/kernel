@@ -69,14 +69,14 @@ pushd $DSTDIR
     ln -s ../usr/bin/busybox.udpcast udp-receiver
     ln -s ../usr/bin/busybox.udpcast udp-sender
 
-    APPLETS="ash chroot cp dd dmesg echo env fdisk grep kill less ls pivot_root  switch_root tar test"
+    APPLETS="ash chroot clear cp dd df dmesg echo egrep env fdisk fgrep grep kill killall killall5 less ls pivot_root switch_root tar test"
     for i in $APPLETS; do
     	ln -s ../usr/bin/busybox-static $i
     done
   popd
   
   pushd usr/bin
-    APPLETS="clear dwipe sort tr wc"
+    APPLETS="clear dwipe mount sort tr wc"
     for i in $APPLETS; do	
 	ln -s ../../usr/bin/busybox-static $i
     done
