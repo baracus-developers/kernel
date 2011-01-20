@@ -36,7 +36,7 @@ pushd $DSTDIR
   ## copy-in the baracus data
   ##
   mkdir -p usr/bin/
-  BA_APPS="busybox-static pxewait baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec"
+  BA_APPS="busybox-static pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec"
   for i in $BA_APPS; do
         cp ../$i usr/bin/.
   done
@@ -71,10 +71,11 @@ pushd $DSTDIR
   popd
   
   pushd usr/bin
-    APPLETS="clear dwipe mount sort tr wc"
+    APPLETS="clear mount sort tr wc"
     for i in $APPLETS; do	
 	ln -s ../../usr/bin/busybox-static $i
     done
+    ln -s ../../usr/bin/busybox.dban dwipe
   popd
   
   pushd etc
