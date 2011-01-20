@@ -36,15 +36,12 @@ pushd $DSTDIR
   ## copy-in the baracus data
   ##
   mkdir -p usr/bin/
-  cp ../busybox-static usr/bin/.
-  cp ../pxewait usr/bin/.
-  cp ../baracus.dban usr/bin/.
-  cp ../baracus.image usr/bin/.
-  cp ../baracus.mcast usr/bin/.
-  cp ../baracus.clone usr/bin/.
-  cp ../baracus.register usr/bin/.
-  cp ../lshw-static.B.02.15.x86 usr/bin/.
-  cp ../dbclient usr/bin/.
+  BA_APPS="busybox-static pxewait baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec"
+  for i in $BA_APPS; do
+        cp ../$i usr/bin/.
+  done
+  cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
+
   cp ../halt sbin/.
   cp ../dropbear sbin/.
   mkdir -p log/dban
@@ -54,8 +51,6 @@ pushd $DSTDIR
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
   cp ../shells etc/.
-  cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
-  cp ../shellexec usr/bin/.
   
   pushd usr
     ln -s . i386-linux-uclibc
