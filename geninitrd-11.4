@@ -22,16 +22,12 @@ echo "using initrd: $INITRD_IMG"
 
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
 mkdir -p $DSTDIR
-cp $DATADIR/$INITRD_IMG $DSTDIR
 
 ## Extract the image
 ##
 
 pushd $DSTDIR
-  mv $INITRD_IMG initrd.gz
-  gzip -d initrd.gz
-  cpio --quiet -id < initrd 
-  rm initrd
+  zcat ../$INITRD_IMG | cpio --quiet -id
 
   ## copy-in the baracus data
   ##
