@@ -68,24 +68,18 @@ pushd $DSTDIR
   pushd bin
     ln -s ../usr/bin/busybox.udpcast udp-receiver
     ln -s ../usr/bin/busybox.udpcast udp-sender
-    ln -s ../usr/bin/busybox.dban ash
-    ln -s ../usr/bin/busybox.dban cp
-    ln -s ../usr/bin/busybox.dban dd
-    ln -s ../usr/bin/busybox.dban dmesg
-    ln -s ../usr/bin/busybox.dban echo
-    ln -s ../usr/bin/busybox.dban grep
-    ln -s ../usr/bin/busybox.dban ls
-    ln -s ../usr/bin/busybox.dban tar
-    ln -s ../usr/bin/busybox.dban date
-    ln -s ../usr/bin/busybox.dban mv
+
+    APPLETS="ash cp dd dmesg echo grep ls tar date mv"
+    for i in $APPLETS; do
+        ln -s ../usr/bin/busybox.dban $i
+    done
   popd
   
   pushd usr/bin
-    ln -s ../../usr/bin/busybox.dban clear
-    ln -s ../../usr/bin/busybox.dban dwipe
-    ln -s ../../usr/bin/busybox.dban sort
-    ln -s ../../usr/bin/busybox.dban tr
-    ln -s ../../usr/bin/busybox.dban wc
+    APPLETS="clear dwipe sort tr wc"
+    for i in $APPLETS; do
+        ln -s ../../usr/bin/busybox.dban $i
+    done
   popd
   
   pushd etc
