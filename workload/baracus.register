@@ -2,7 +2,7 @@
 
 ################################################
 ## Default PXE for inventory and registration ##
-## ver .10                                    ##
+## ver 1.20                                   ##
 ################################################
 
 echo -ne "Getting network settings via dhcp\n"
@@ -13,6 +13,7 @@ echo -ne "Getting network settings via dhcp\n"
 FILE=/tmp/$mac.inventory
 COOKIE="mac=$mac"
 URL="http://$baracus/ba/inventory"
+STATUS="success"
 
 echo -ne "collecting inventory information\n"
 
@@ -27,5 +28,55 @@ fi
 echo -ne "uploading inventory file to $baracus ...\n"
 
 /usr/bin/curl -b $COOKIE -T $FILE $URL
+
+## Test for ipmi auto-configuration option
+ipmi=`sed -re 's/^.* ipmi=([^ ]*).*$/\1/' /proc/cmdline`
+ipmilan=`sed -re 's/^.* ipmilan=([^ ]*).*$/\1/' /proc/cmdline`
+if [[ "$ipmi" == "true" ]]; then
+  ## Attempt to load ipmi kernel modules
+  modprobe -a ipmi_si
+  modprobe -a ipmi_devintf
+  modprobe -a ipmi_msghandler
+
+  ## Test for ipmi interface availability
+  ipmitool mc selftest | grep passed >& /dev/null
+  if [[ $? = 0 ]]; then ## ipmi is available
+    ## Setup baracus user account
+    ipmitool user list 1 | grep baracus >& /dev/null
+    if [[ $? = 1 ]]; then
+      for i in  {2..9} ; do ipmitool user list 1 | grep ^$i >& /dev/null; if [[ $? = 1 ]]; then export ipmiID="$i"; break; fi; done
+      ipmitool user set name $ipmiID baracus
+      ipmitool user set password $ipmiID baracus
+      ipmitool user priv $ipmiID 4 1
+      ipmitool user enable $ipmiID 
+    
+
+      if [[ "$ipmilan" == "true" ]]; then
+        ## Setup ipmi lan interface
+        ipmitool lan set 1 ipsrc dhcp
+        ipmitool lan set 1 auth admin password
+        ipmitool lan set 1 access on
+      fi
+
+      ## Capture ipmi lan address
+      sleep 60
+      ipmiaddr=`ipmitool lan print 1 | grep "IP Address" | grep -v Source | sed 's/^.* : //'`
+      ipmimac=`ipmitool lan print 1 | grep "MAC Address" | sed -re  's/^.*: ([^ ]*).*$/\1/'`
+      nodeaddr=`/sbin/ifconfig eth0 | grep "inet " | sed -re  's/^.* addr:([^ ]*).*$/\1/'`
+
+      ipmimsg="ipmi baracus user configured"
+    else
+      ipmimsg="ipmi baracus user already defined"
+      status="fail"
+    fi
+  else
+      ipmimsg="ipmi interface not available or supported"
+      status="fail"
+  fi
+
+## Generate return response
+COOKIE2="mac=$mac;ipmiaddr=$ipmiaddr;ipmimac=$ipmimac;nodeaddr=$nodeaddr;status=$STATUS;ipmimsg=$ipmimsg"
+/usr/bin/curl -b $COOKIE2 http://$baracus/ba/ipmi
+fi
 
 /sbin/reboot -f
