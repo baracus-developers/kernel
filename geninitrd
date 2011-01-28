@@ -117,18 +117,24 @@ mkdir -p $DSTDIR
     mv tmppasswd passwd
   popd
 
-  pushd parts
-    unsquashfs 00_lib &> /dev/null
-    cp ../../$INITRD_IMG-modules/ipmi* squashfs-root/lib/modules/$KERNEL/initrd/
+  # modern non-xen kernels have fs pkg'd in parts
+  if [[ -d parts ]] ; then
+    pushd parts
+      unsquashfs 00_lib &> /dev/null
+      cp ../../$INITRD_IMG-modules/ipmi* squashfs-root/lib/modules/$KERNEL/initrd/
     
-    export KPATH=`pwd`/squashfs-root         # var is location sensitive KPATH must be here
-    pushd squashfs-root/lib/modules/$KERNEL
-      depmod -a --basedir $KPATH $KERNEL
+      export KPATH=`pwd`/squashfs-root         # var is location sensitive KPATH must be here
+      pushd squashfs-root/lib/modules/$KERNEL
+        depmod -a --basedir $KPATH $KERNEL
+      popd
+      rm 00_lib
+      mksquashfs squashfs-root/ 00_lib &> /dev/null
+      rm -Rf squashfs-root/
     popd
-    rm 00_lib
-    mksquashfs squashfs-root/ 00_lib &> /dev/null
-    rm -Rf squashfs-root/
-  popd
+  else
+    # when we need we'll modifiy so we can add modules to xen initrd here too
+    echo "not working with parts dir - hope this is a xen initrd or it won't have ipmi"
+  fi
   
   ## create the new image
   ##
