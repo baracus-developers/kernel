@@ -147,7 +147,7 @@ pushd $DATADIR
   mv $INITRD_IMG.baracus.gz $INITRD_IMG.baracus
 popd
 
-#[[ -d $DSTDIR ]] && rm -rf $DSTDIR
+[[ -d $DSTDIR ]] && rm -rf $DSTDIR
 
 ## complete
 ##
