@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Fri Jan 28 16:36:13 UTC 2011 - dbahi@novell.com
+
+- release 1.7.0
+- ipmi support added to workload
+- xen "arch" now supported for workloads
+
+-------------------------------------------------------------------
 Thu Jan  6 20:59:47 UTC 2011 - dbahi@novell.com
 
 - corrections to pxewait and clone worloads for /dev/pts
