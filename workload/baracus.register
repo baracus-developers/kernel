@@ -67,11 +67,13 @@ if [[ "$ipmi" == "true" ]]; then
       ipmimsg="ipmi baracus user configured"
     else
       ipmimsg="ipmi baracus user already defined"
-      status="fail"
+      STATUS="fail"
     fi
   else
       ipmimsg="ipmi interface not available or supported"
-      status="fail"
+      ipmiaddr="null"
+      ipmimac="null"
+      STATUS="fail"
   fi
 
 ## Generate return response
