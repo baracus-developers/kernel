@@ -32,6 +32,7 @@ echo -ne "uploading inventory file to $baracus ...\n"
 ## Test for ipmi auto-configuration option
 ipmi=`sed -re 's/^.* ipmi=([^ ]*).*$/\1/' /proc/cmdline`
 ipmilan=`sed -re 's/^.* ipmilan=([^ ]*).*$/\1/' /proc/cmdline`
+nodeaddr=`/sbin/ifconfig eth0 | grep "inet " | sed -re  's/^.* addr:([^ ]*).*$/\1/'`
 if [[ "$ipmi" == "true" ]]; then
   ## Attempt to load ipmi kernel modules
   modprobe -a ipmi_si
@@ -62,7 +63,6 @@ if [[ "$ipmi" == "true" ]]; then
       sleep 60
       ipmiaddr=`ipmitool lan print 1 | grep "IP Address" | grep -v Source | sed 's/^.* : //'`
       ipmimac=`ipmitool lan print 1 | grep "MAC Address" | sed -re  's/^.*: ([^ ]*).*$/\1/'`
-      nodeaddr=`/sbin/ifconfig eth0 | grep "inet " | sed -re  's/^.* addr:([^ ]*).*$/\1/'`
 
       ipmimsg="ipmi baracus user configured"
     else
@@ -77,8 +77,8 @@ if [[ "$ipmi" == "true" ]]; then
   fi
 
 ## Generate return response
-COOKIE2="mac=$mac;ipmiaddr=$ipmiaddr;ipmimac=$ipmimac;nodeaddr=$nodeaddr;status=$STATUS;ipmimsg=$ipmimsg"
-/usr/bin/curl -b $COOKIE2 http://$baracus/ba/ipmi
+COOKIE2="mac=$mac;nodeaddr=$nodeaddr;ipmimac=$ipmimac;ipmiaddr=$ipmiaddr;status=$STATUS;ipmimsg=$ipmimsg"
+/usr/bin/curl -b "$COOKIE2" http://$baracus/ba/ipmi
 fi
 
 /sbin/reboot -f
