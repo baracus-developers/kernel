@@ -3,7 +3,7 @@
 
 Summary:   Files needed to perform independent baracus tasks
 Name:      %{sname}-kernel
-Version:   1.7.1
+Version:   1.7.2
 Release:   0
 Group:     System/Services
 License:   GPLv2 or Artistic V2
