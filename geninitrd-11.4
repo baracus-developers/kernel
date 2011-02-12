@@ -18,6 +18,14 @@ DSTDIR=$DATADIR/initrd.dir
 [ ! -z "$1" ] && INITRD_IMG=$1 
 [ -z "$INITRD_IMG" ] &&  INITRD_IMG=initrd.opensuse-11.4
 
+if [[ "$INITRD_IMG" == "initrd.opensuse-11.3" ]]; then
+    KERNEL="2.6.34-12-default"
+elif [[ "$INITRD_IMG" == "initrd.opensuse-11.4" ]]; then
+    KERNEL="2.6.36-18-default"
+else
+    KERNEL=""
+fi
+
 echo "using initrd: $INITRD_IMG"
 
 [[ -d $DSTDIR ]] && rm -rf $DSTDIR
@@ -79,6 +87,18 @@ pushd $DSTDIR
     echo "root:x:0:0:root:/root:/usr/bin/shellexec" > tmppasswd
     grep -v "root" passwd >> tmppasswd
     mv tmppasswd passwd
+  popd
+
+  pushd parts
+    unsquashfs 00_lib &> /dev/null
+    cp ../../$INITRD_IMG-modules/ipmi* squashfs-root/lib/modules/$KERNEL/initrd/
+     KPATH=`pwd`/squashfs-root
+    pushd squashfs-root/lib/modules/$KERNEL
+        depmod -a --basedir $KPATH $KERNEL
+    popd
+    rm 00_lib
+    mksquashfs squashfs-root/ 00_lib &> /dev/null
+    rm -Rf squashfs-root/
   popd
   
   ## create the new image
