@@ -38,7 +38,7 @@ popd()
 if [[ "$INITRD_IMG" == "initrd.opensuse-11.3" ]]; then
     KERNEL="2.6.34-12-default"
 elif [[ "$INITRD_IMG" == "initrd.opensuse-11.4" ]]; then
-    KERNEL="2.6.36-18-default"
+    KERNEL="2.6.37-20-default"
 else
     KERNEL=""
 fi
@@ -47,8 +47,8 @@ DATADIR=`pwd`/workload
 DSTDIR="$DATADIR/$INITRD_IMG.dir"
 BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
 #BA_APPS="busybox-static pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
-BIN_APPLETS="ash cp dd dmesg echo grep ls tar date mv"
-# APPLETS="ash chroot clear cp dd df dmesg echo egrep env fdisk fgrep grep kill killall killall5 less ls pivot_root switch_root tar test"
+BIN_APPLETS="ash cp dd dmesg echo grep ls tar"
+#BIN_APPLETS="ash chroot clear cp dd df dmesg echo env egrep grep fgrep fdisk kill killall killall5 less ls pivot_root switch_root tar test"
 USR_BIN_APPLETS="clear dwipe sort tr wc"
 # APPLETS="clear mount sort tr wc"
 
@@ -68,8 +68,8 @@ mkdir -p $DSTDIR
 ##
 
 [[ -d $DSTDIR ]] && pushd $DSTDIR
-  zcat ../$INITRD_IMG | cpio --quiet -id
-
+  zcat ../$INITRD_IMG | cpio --quiet -id  
+  
   ## copy-in the baracus data
   ##
   mkdir -p usr/bin/
@@ -101,15 +101,15 @@ mkdir -p $DSTDIR
     ln -s ../usr/bin/busybox.udpcast udp-sender
 
     for i in $BIN_APPLETS; do
-    	ln -s ../usr/bin/busybox-static $i
+        ln -s ../usr/bin/busybox.dban $i
     done
   popd
   
   pushd usr/bin
     for i in $USR_BIN_APPLETS; do	
-	ln -s ../../usr/bin/busybox-static $i
+        ln -s ../../usr/bin/busybox.dban $i
+#	ln -s ../../usr/bin/busybox-static $i
     done
-    ln -s ../../usr/bin/busybox.dban dwipe
   popd
   
   pushd etc
