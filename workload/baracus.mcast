@@ -22,7 +22,7 @@ fi
 
 if [[ "$STATUS" == "pass" ]]; then
     echo -ne "Deploying image\n"
-    /bin/udp-receiver --sync --mcast-rdv-address $bardvaddr | /bin/gzip -d | dd of=$baimagedst
+    /bin/udp-receiver --sync --mcast-rdv-address $bardvaddr --portbase $port | /bin/gzip -d | dd of=$baimagedst
     if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
