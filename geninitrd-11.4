@@ -46,8 +46,8 @@ fi
 DATADIR=`pwd`/workload
 DSTDIR="$DATADIR/$INITRD_IMG.dir"
 BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
-#BA_APPS="busybox-static pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
 BIN_APPLETS="ash cp dd dmesg echo grep ls tar"
+#BA_APPS="busybox-static pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
 #BIN_APPLETS="ash chroot clear cp dd df dmesg echo env egrep grep fgrep fdisk kill killall killall5 less ls pivot_root switch_root tar test"
 USR_BIN_APPLETS="clear dwipe sort tr wc"
 # APPLETS="clear mount sort tr wc"
@@ -106,7 +106,7 @@ mkdir -p $DSTDIR
   popd
   
   pushd usr/bin
-    for i in $USR_BIN_APPLETS; do	
+    for i in $USR_BIN_APPLETS; do
         ln -s ../../usr/bin/busybox.dban $i
 #	ln -s ../../usr/bin/busybox-static $i
     done
