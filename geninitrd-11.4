@@ -87,6 +87,8 @@ mkdir -p $DSTDIR
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
   cp ../shells etc/.
+  cp ../mount.nfs sbin/
+  cp ../lib/* lib/
   
   pushd usr
     ln -s . i386-linux-uclibc
