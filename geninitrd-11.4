@@ -99,17 +99,17 @@ mkdir -p $DSTDIR
   popd
   
   pushd bin
-    ln -s ../usr/bin/busybox.udpcast udp-receiver
-    ln -s ../usr/bin/busybox.udpcast udp-sender
+    ln -s /usr/bin/busybox.udpcast udp-receiver
+    ln -s /usr/bin/busybox.udpcast udp-sender
 
     for i in $BIN_APPLETS; do
-        ln -s ../usr/bin/busybox.dban $i
+        ln -s /usr/bin/busybox.dban $i
     done
   popd
   
   pushd usr/bin
     for i in $USR_BIN_APPLETS; do
-        ln -s ../../usr/bin/busybox.dban $i
+        ln -s /usr/bin/busybox.dban $i
 #	ln -s ../../usr/bin/busybox-static $i
     done
   popd
