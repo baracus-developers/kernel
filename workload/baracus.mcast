@@ -37,6 +37,6 @@ echo -ne "uploading results file to $baracus ...\n"
 URL="http://$baracus/ba/mcast"
 COOKIE="mac=$mac;status=$STATUS"
 
-/usr/bin/curl -b $COOKIE -T $FILE $URL
+/usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE -T $FILE $URL
 
 /sbin/reboot -f

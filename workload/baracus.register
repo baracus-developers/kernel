@@ -27,7 +27,7 @@ fi
 
 echo -ne "uploading inventory file to $baracus ...\n"
 
-/usr/bin/curl -b $COOKIE -T $FILE $URL
+/usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE -T $FILE $URL
 
 ## Test for ipmi auto-configuration option
 ipmi=`sed -re 's/^.* ipmi=([^ ]*).*$/\1/' /proc/cmdline`

@@ -131,6 +131,6 @@ fi
 echo "Hardware clock operation start date:  $DBAN_START"
 echo "Hardware clock operation finish date: $DBAN_FINISH"
 
-/usr/bin/curl -b $COOKIE -T $FILE $URL
+/usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE -T $FILE $URL
 
 /sbin/halt -p -n -f

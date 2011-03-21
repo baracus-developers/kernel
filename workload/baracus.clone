@@ -112,8 +112,8 @@ clone()
     fi
 
     COOKIE2="mac=$macaddr;status=$STATUS"
-    echo "/usr/bin/curl -b \"$COOKIE2\" -T $FILE http://$baracus/ba/clonelog"
-    /usr/bin/curl -b $COOKIE2 -T $FILE http://$baracus/ba/clonelog
+    echo "/usr/bin/curl -H 'Content-Type: application/octet-stream' -b \"$COOKIE2\" -T $FILE http://$baracus/ba/clonelog"
+    /usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE2 -T $FILE http://$baracus/ba/clonelog
 
     sleep 5
     echo "rebooting..."
