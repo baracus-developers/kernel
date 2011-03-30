@@ -3,7 +3,7 @@
 trap 'keeper' 2
 trap 'keeper' 20
 
-# weird that we don't ahve these in all our shells ... extract
+# weird that we don't have these in all our shells ... extract
 
 export baimagesrc=`sed -re 's/^.* baimagesrc="?([^ "]*).*$/\1/' /proc/cmdline`
 export baimagedst=`sed -re 's/^.* baimagedst="?([^ "]*).*$/\1/' /proc/cmdline`
