@@ -47,7 +47,7 @@ fi
 
 DATADIR=`pwd`/workload
 DSTDIR="$DATADIR/$INITRD_IMG.dir"
-BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.migrate baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
+BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.migrate baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool rsync"
 BIN_APPLETS="ash cp dd dmesg echo grep ls tar date mv"
 USR_BIN_APPLETS="clear dwipe sort tr wc"
 
@@ -77,8 +77,6 @@ mkdir -p $DSTDIR
   done
   cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
 
-  cp ../halt sbin/.
-  cp ../dropbear sbin/.
   mkdir -p log/dban
   mkdir -p usr/share/
   cp -r ../terminfo usr/share/.
@@ -86,7 +84,9 @@ mkdir -p $DSTDIR
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
   cp ../shells etc/.
-  
+  cp -a ../sbin/* sbin/
+  cp -a ../lib/* lib/
+
   pushd usr
     ln -s . i386-linux-uclibc
   popd
