@@ -47,7 +47,7 @@ fi
 
 DATADIR=`pwd`/workload
 DSTDIR="$DATADIR/$INITRD_IMG.dir"
-BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
+BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.migrate baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool"
 BIN_APPLETS="ash cp dd dmesg echo grep ls tar date mv"
 USR_BIN_APPLETS="clear dwipe sort tr wc"
 
