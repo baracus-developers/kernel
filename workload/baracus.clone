@@ -96,7 +96,7 @@ clone()
     /usr/sbin/hwinfo --disk --short > /tmp/hwinfo.disk
     /bin/grep $baimagesrc /tmp/hwinfo.disk >& /dev/null
     if [[ $? -ne 0 ]]; then
-      echo -ne "target disk device not found: $baimagesrc" >> $FILE
+      echo -ne "source disk device not found: $baimagesrc" >> $FILE
       /bin/cat /tmp/hwinfo.disk >> $FILE
       STATUS="fail"
     fi
