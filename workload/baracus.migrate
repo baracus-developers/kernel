@@ -5,8 +5,8 @@ trap 'keeper' 20
 
 # weird that we don't have these in all our shells ... extract
 
-export baimagesrc=`sed -re 's/^.* baimagesrc="?([^ "]*).*$/\1/' /proc/cmdline`
-export baimagedst=`sed -re 's/^.* baimagedst="?([^ "]*).*$/\1/' /proc/cmdline`
+export basrcfs=`sed -re 's/^.* basrcfs="?([^ "]*).*$/\1/' /proc/cmdline`
+export badstfs=`sed -re 's/^.* badstfs="?([^ "]*).*$/\1/' /proc/cmdline`
 export baracus=`sed -re 's/^.* baracus=([^ ]*).*$/\1/' /proc/cmdline`
 export macaddr=`sed -re 's/^.* mac=([^ ]*).*$/\1/' /proc/cmdline`
 
@@ -17,7 +17,7 @@ if [[ ! -f /tmp/flag ]]; then
     echo -ne "Getting network settings via dhcp\n"
     /sbin/dhcpcd -t60 eth0
     mkdir /dev/pts
-    mount -t devpts devpts /dev/pts
+    /bin/mount -t devpts devpts /dev/pts
     sleep 5
     /sbin/dropbear -p 0.0.0.0:22 -r /etc/dropbear/dropbear_rsa_host_key
     echo "baracus.migrate" > /tmp/sshshell
@@ -47,15 +47,15 @@ menu()
     fi
     echo "Local IP:  $ipaddr"
     echo "Baracus Host: $baracus"
-    echo "Specified Disk: $baimagesrc"
-    echo "Specified Image Name: $baimagedst"
+    echo "Source Filesystem: $basrcfs"
+    echo "Target Filesystem: $badstfs"
     echo "-------------------------------------"
     echo "| Baracus command shell             |"
     echo "|                                   |"
     if [[ -f $FILE ]]; then
-        echo "| 1 - migrate of system in progress   |"
+        echo "| 1 - migrate of system in progress |"
     else
-        echo "| 1 - migrate system                  |"
+        echo "| 1 - migrate system                |"
     fi
     echo "| 2 - reboot                        |"
     echo "| 3 - shutdown                      |"
@@ -65,12 +65,12 @@ menu()
 
 migrate()
 {
-    echo "migrating $baimagesrc ..."
+    echo "migrating $basrcfs ..."
     STATUS="pass"
 
     if [[ -f $FILE ]]; then
         # barf as someone is trying to kick off a 2nd migrate while one is going
-        echo "A migrate of $baimagesrc to $baimagedst is already in progress."
+        echo "A migrate of $basrcfs to $badstfs is already in progress."
         return
     fi
 
@@ -79,35 +79,41 @@ migrate()
     echo "Starting..." > $FILE
     date >> $FILE
     echo "golden host: $macaddr" >> $FILE
-    echo "raw disk: $baimagesrc" >> $FILE
-    echo "image name:  $baimagedst" >> $FILE
-
-
-    IMAGE=http://$baracus/var/spool/baracus/images/$baimagedst.gz
-
-    /usr/bin/curl --silent --head $IMAGE > /tmp/curl.head
-    /bin/grep -i "Not Found" /tmp/curl.head >& /dev/null
+    echo "source: $basrcfs" >> $FILE
+    echo "target:  $badstfs" >> $FILE
+ 
+    NFSROOT="/nfsroot"
+    mkdir $NFSROOT
+    /sbin/mount.nfs $badstfs $NFSROOT -o nolock
     if [[ $? -ne 0 ]]; then
-        echo "Image file target found - refusing to overwrite: $IMAGE" >> $FILE
+        echo "Destination volume cannot be mounted: $badstfs" >> $FILE
+        /bin/cat /tmp/curl.head >> $FILE
+        STATUS="fail"
+    fi
+
+#    /bin/mount $basrcfs /mnt
+    mount /dev/vda2 /mnt
+    if [[ $? -ne 0 ]]; then
+        echo "Source volume cannot be mounted: $basrcfs" >> $FILE
         /bin/cat /tmp/curl.head >> $FILE
         STATUS="fail"
     fi
 
     /usr/sbin/hwinfo --disk --short > /tmp/hwinfo.disk
-    /bin/grep $baimagesrc /tmp/hwinfo.disk >& /dev/null
+#    /bin/grep $basrcfs /tmp/hwinfo.disk >& /dev/null
     if [[ $? -ne 0 ]]; then
-      echo -ne "target disk device not found: $baimagesrc" >> $FILE
+      echo -ne "target disk device not found: $basrcfs" >> $FILE
       /bin/cat /tmp/hwinfo.disk >> $FILE
-      STATUS="fail"
+#      STATUS="fail"
     fi
 
     if [[ "$STATUS" == "pass" ]]; then
-       /bin/dd if=$baimagesrc | /bin/gzip | /usr/bin/dbclient -i /.ssh/id_rsa.db baracus@$baracus "gzip -d | sparsefile > images/$baimagedst && gzip images/$baimagedst"
+      rsync -a --delete /mnt/ /nfsroot/ 
       if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
       else
-        echo "Successfully uploaded migrated image" >> $FILE
+        echo "Successfully migrated file system" >> $FILE
       fi
     fi
 
@@ -115,7 +121,7 @@ migrate()
     echo "/usr/bin/curl -H 'Content-Type: application/octet-stream' -b \"$COOKIE2\" -T $FILE http://$baracus/ba/migratelog"
     /usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE2 -T $FILE http://$baracus/ba/migratelog
 
-    sleep 5
+    sleep 60
     echo "rebooting..."
     /sbin/reboot -f
 }
