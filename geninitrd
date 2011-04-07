@@ -47,11 +47,11 @@ fi
 
 DATADIR=`pwd`/workload
 DSTDIR="$DATADIR/$INITRD_IMG.dir"
-BA_APPS="pxewait busybox.dban baracus.dban baracus.image baracus.mcast baracus.clone baracus.migrate baracus.register lshw-static.B.02.15.x86 dbclient shellexec ipmitool rsync"
+
 BIN_APPLETS="ash cp dd dmesg echo grep ls tar date mv"
 USR_BIN_APPLETS="clear dwipe sort tr wc"
 
-export KERNEL DATADIR INITRD_IMG DSTDIR BA_APPS BIN_APPLETS USR_BIN_APPLETS
+export KERNEL DATADIR INITRD_IMG DSTDIR BIN_APPLETS USR_BIN_APPLETS
 
 if [[ ! -f "$DATADIR/$INITRD_IMG" ]] ; then
   echo "unable to find specified initrd: $DATADIR/$INITRD_IMG"
@@ -69,23 +69,21 @@ mkdir -p $DSTDIR
 [[ -d $DSTDIR ]] && pushd $DSTDIR
   zcat ../$INITRD_IMG | cpio --quiet -id  
   
-  ## copy-in the baracus data
-  ##
-  mkdir -p usr/bin/
-  for i in $BA_APPS; do
-        cp ../$i usr/bin/.
-  done
-  cp ../busybox-1.16.1.udpcast-20100130 usr/bin/busybox.udpcast
 
   mkdir -p log/dban
   mkdir -p usr/share/
-  cp -r ../terminfo usr/share/.
+  mkdir -p usr/bin/
   mkdir -p etc/dropbear
+
+  cp -a ../bin/* usr/bin/.
+  cp -a ../sbin/* sbin/.
+  cp -a ../lib/* lib/.
+  cp -r ../terminfo usr/share/.
+
+  cp ../shells etc/.
+
   cp ../dropbear_rsa_host_key etc/dropbear
   chown root:root etc/dropbear/dropbear_rsa_host_key
-  cp ../shells etc/.
-  cp -a ../sbin/* sbin/
-  cp -a ../lib/* lib/
 
   pushd usr
     ln -s . i386-linux-uclibc
@@ -96,8 +94,8 @@ mkdir -p $DSTDIR
   popd
   
   pushd bin
-    ln -s /usr/bin/busybox.udpcast udp-receiver
-    ln -s /usr/bin/busybox.udpcast udp-sender
+    ln -s /usr/bin/busybox-1.16.1.udpcast-20100130 udp-receiver
+    ln -s /usr/bin/busybox-1.16.1.udpcast-20100130 udp-sender
 
     for i in $BIN_APPLETS; do
         ln -s /usr/bin/busybox.dban $i
