@@ -1,4 +1,11 @@
 -------------------------------------------------------------------
+Thu Apr  7 02:46:35 UTC 2011 - dbahi@novell.com
+
+- curl invocations set content-type to work with perl-CGI in 11.3+
+- mcast handling now includes portbase to pick out mcast stream
+- workloads can nfs mount and rsync if needed
+
+-------------------------------------------------------------------
 Wed Feb  2 20:38:22 UTC 2011 - dbahi@novell.com
 
 - more ipmi bits
