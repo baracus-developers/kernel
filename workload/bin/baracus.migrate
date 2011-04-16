@@ -84,15 +84,14 @@ migrate()
  
     NFSROOT="/nfsroot"
     mkdir $NFSROOT
-    /sbin/mount.nfs $badstfs $NFSROOT -o nolock
+    /sbin/mount.nfs $badstfs $NFSROOT -o nolock,async
     if [[ $? -ne 0 ]]; then
         echo "Destination volume cannot be mounted: $badstfs" >> $FILE
         /bin/cat /tmp/curl.head >> $FILE
         STATUS="fail"
     fi
 
-#    /bin/mount $basrcfs /mnt
-    mount /dev/vda2 /mnt
+    mount $basrcfs /mnt
     if [[ $? -ne 0 ]]; then
         echo "Source volume cannot be mounted: $basrcfs" >> $FILE
         /bin/cat /tmp/curl.head >> $FILE
@@ -108,7 +107,7 @@ migrate()
     fi
 
     if [[ "$STATUS" == "pass" ]]; then
-      rsync -a --delete /mnt/ /nfsroot/ 
+      rsync -av --delete /mnt/ /nfsroot/ 
       if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
