@@ -99,7 +99,6 @@ migrate()
     fi
 
     /usr/sbin/hwinfo --disk --short > /tmp/hwinfo.disk
-#    /bin/grep $basrcfs /tmp/hwinfo.disk >& /dev/null
     if [[ $? -ne 0 ]]; then
       echo -ne "target disk device not found: $basrcfs" >> $FILE
       /bin/cat /tmp/hwinfo.disk >> $FILE
@@ -107,7 +106,7 @@ migrate()
     fi
 
     if [[ "$STATUS" == "pass" ]]; then
-      rsync -av --delete /mnt/ /nfsroot/ 
+      rsync -acv --delete /mnt/ /nfsroot/ 
       if [[ $? -ne 0 ]]; then
         echo "failure - exit code $? - msg $!" >> $FILE
         STATUS="fail"
@@ -120,7 +119,7 @@ migrate()
     echo "/usr/bin/curl -H 'Content-Type: application/octet-stream' -b \"$COOKIE2\" -T $FILE http://$baracus/ba/migratelog"
     /usr/bin/curl -H 'Content-Type: application/octet-stream' -b $COOKIE2 -T $FILE http://$baracus/ba/migratelog
 
-    sleep 60
+    sleep 10
     echo "rebooting..."
     /sbin/reboot -f
 }
